@@ -5,6 +5,16 @@
 **Status**: Draft  
 **Input**: User description: "Support for Overdue Todo Items - Users need a clear, visual way to identify which todos have not been completed by their due date"
 
+## Clarifications
+
+### Session 2026-01-29
+
+- Q: What type of visual indicator should be used for overdue items? → A: Color + icon combination (e.g., red color with warning icon)
+- Q: For the overdue counter display behavior when there are zero overdue items, we need to decide how this impacts the user experience and UI consistency. → A: Hide the counter
+- Q: Where should the overdue counter be located in the UI? → A: Header/summary area above the todo list
+- Q: Where should the "days overdue" information appear relative to each todo item? → A: Below the todo title as secondary text
+- Q: How does the system determine when a todo becomes overdue at the date boundary? → A: Start of next day (midnight)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Visual Identification of Overdue Items (Priority: P1)
@@ -27,7 +37,7 @@ Users with incomplete tasks past their due date need to immediately identify whi
 
 ### User Story 2 - Overdue Count Summary (Priority: P2)
 
-Users need to see at a glance how many overdue items they have without counting individual items in the list. A summary counter displays the total number of overdue todos.
+Users need to see at a glance how many overdue items they have without counting individual items in the list. A summary counter displays the total number of overdue todos in the header/summary area above the todo list.
 
 **Why this priority**: Provides quick awareness of workload backlog and helps users prioritize their time. This is secondary to the visual identification (P1) but adds significant value for users with many todos.
 
@@ -36,7 +46,7 @@ Users need to see at a glance how many overdue items they have without counting 
 **Acceptance Scenarios**:
 
 1. **Given** a user has 3 incomplete todos with past due dates and 2 incomplete todos with future due dates, **When** they view their todo list, **Then** an overdue counter displays "3 overdue"
-2. **Given** a user has no incomplete todos with past due dates, **When** they view their todo list, **Then** the overdue counter displays "0 overdue" or is hidden
+2. **Given** a user has no incomplete todos with past due dates, **When** they view their todo list, **Then** the overdue counter is hidden from view
 3. **Given** a user marks an overdue todo as complete, **When** the list updates, **Then** the overdue counter decrements by 1
 4. **Given** the current date advances and a todo's due date becomes past, **When** the user refreshes or views their list, **Then** the overdue counter increments by 1
 
@@ -48,7 +58,7 @@ Users need to see at a glance how many overdue items they have without counting 
 
 **Why this priority**: [Explain the value and why it has this priority level]
 
-Users want to know not just that an item is overdue, but how long it has been overdue. The system calculates and displays the number of days overdue for each overdue todo item.
+Users want to know not just that an item is overdue, but how long it has been overdue. The system calculates and displays the number of days overdue for each overdue todo item as secondary text below the todo title.
 
 **Why this priority**: Enhances awareness of priority by showing which items are most severely overdue. This is a nice-to-have enhancement that provides additional context but is not essential for the core functionality.
 
@@ -65,25 +75,25 @@ Users want to know not just that an item is overdue, but how long it has been ov
 
 ### Edge Cases
 
-- What happens when the system date/time changes (e.g., user travels across time zones or changes system clock)?
-- How does the system handle todos with due dates far in the past (e.g., years ago)?
-- What happens when a completed todo's due date was in the past - should historical overdue status be visible?
-- How does the system handle date calculations at midnight (boundary between today and tomorrow)?
-- What happens if a user has a very large number of overdue items (hundreds)?
+- What happens when the system date/time changes (e.g., user travels across time zones or changes system clock)? System will recalculate overdue status based on new system time on next render/refresh.
+- How does the system handle todos with due dates far in the past (e.g., years ago)? System will calculate and display accurate day count regardless of how far in the past.
+- What happens when a completed todo's due date was in the past - should historical overdue status be visible? No, completed todos never display as overdue regardless of due date.
+- How does the system handle date calculations at midnight (boundary between today and tomorrow)? A todo due today becomes overdue at 00:00:00 (midnight) the next day in the user's local time zone.
+- What happens if a user has a very large number of overdue items (hundreds)? Counter will display the accurate count; no special handling for large numbers.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-001**: System MUST compare each incomplete todo's due date against the current date to determine overdue status
-- **FR-002**: System MUST apply distinct visual styling to incomplete todos with due dates before the current date
+- **FR-002**: System MUST apply distinct visual styling (color + icon combination) to incomplete todos with due dates before the current date for accessibility and quick recognition
 - **FR-003**: System MUST NOT mark completed todos as overdue regardless of their due date
 - **FR-004**: System MUST NOT mark todos without due dates as overdue
-- **FR-005**: System MUST treat todos with a due date of "today" as NOT overdue during that calendar day
+- **FR-005**: System MUST treat todos with a due date of "today" as NOT overdue during that calendar day, becoming overdue at 00:00:00 (midnight) the next day in the user's local time zone
 - **FR-006**: System MUST recalculate overdue status dynamically when the date changes (e.g., at midnight or when user refreshes)
-- **FR-007**: System MUST display a count of the total number of overdue todos
+- **FR-007**: System MUST display a count of the total number of overdue todos in the header/summary area above the todo list when count is greater than zero, and hide the counter when count is zero
 - **FR-008**: System MUST update the overdue count immediately when a todo's status changes (completed/uncompleted) or when due dates are modified
-- **FR-009**: System MUST calculate and display the number of days between the due date and current date for overdue items
+- **FR-009**: System MUST calculate and display the number of days between the due date and current date for overdue items as secondary text below the todo title
 - **FR-010**: System MUST update overdue duration calculations when the current date changes
 
 ### Key Entities *(include if feature involves data)*
